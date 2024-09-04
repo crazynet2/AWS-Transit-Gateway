@@ -1,0 +1,48 @@
+ 1. **Create the Transit Gateway (if not already created)**
+   - Go to the AWS Management Console.
+   - Navigate to **VPC > Transit Gateways > Create Transit Gateway**.
+   - Provide a **Name** for the TGW.
+   - Specify the **ASN** (Autonomous System Number) for BGP. AWS uses 64512 by default, but you can set a custom ASN if needed.
+   - Configure any additional options like **DNS support** and **multicast support** as per your requirements.
+   - Click **Create Transit Gateway**.
+
+ 2. **Create a Transit Gateway Attachment for VPN**
+   - Go to **VPC > Transit Gateway Attachments > Create Transit Gateway Attachment**.
+   - Select your **Transit Gateway**.
+   - For **Attachment Type**, select **VPN**.
+   - Choose the **Customer Gateway** that represents your MikroTik router. If you don’t have a Customer Gateway set up, create one with the public IP address of your MikroTik router.
+   - Specify the **inside IP addresses** (local IPs used for BGP) if required.
+   - Click **Create Attachment**.
+
+ 3. **Configure Transit Gateway Route Tables**
+   - Each TGW attachment can be associated with one or more route tables. You need to configure the route tables to direct traffic between your VPN attachment and other resources (like VPCs).
+   - Go to **VPC > Transit Gateway Route Tables**.
+   - Create a new route table or use an existing one.
+   - **Add routes** that specify how traffic should be routed from your VPN attachment to the relevant VPCs and vice versa.
+   - **Associate** the route table with the appropriate TGW attachments (e.g., your VPN attachment and VPC attachments).
+
+4. **Configure the VPN Connection**
+   - In **VPC > Site-to-Site VPN Connections**, create a new VPN connection.
+   - Choose **Transit Gateway** as the **Target Gateway Type**.
+   - Select the **Transit Gateway** you created.
+   - Choose your **Customer Gateway** (representing your MikroTik router).
+   - Configure the **VPN tunnel options**, such as **Pre-shared key** (PSK), **inside IP addresses**, and **IKE versions**.
+   - Download the configuration file for MikroTik, as it will contain the necessary parameters.
+
+ 5. **Configure BGP on MikroTik Router**
+   - Use the information from the downloaded configuration file to set up BGP on your MikroTik router.
+   - Ensure that the BGP ASN on your MikroTik matches the one set on the TGW.
+   - Configure the BGP peer with the IP addresses provided by AWS in the VPN connection details.
+   - Set up appropriate routes on your MikroTik to route traffic through the VPN to AWS.
+
+ 6. **Security and Route Policies**
+   - Ensure that all relevant Security Groups, Network ACLs, and routing policies on AWS and your MikroTik are configured to allow traffic.
+   - If using multiple VPCs, make sure that the TGW route tables are properly set up to route traffic between VPCs and your on-premises network.
+
+ 7. **Test the Configuration**
+   - After everything is set up, test the connectivity between your on-premises network and AWS resources.
+   - Use `ping`, `traceroute`, or any other network diagnostic tool to ensure that traffic flows as expected.
+   - Monitor the BGP session on your MikroTik router and ensure that the routes are being advertised correctly.
+
+ Summary:
+The main configuration steps for using a Transit Gateway involve creating the TGW, setting up a VPN attachment, configuring the TGW route tables, and ensuring proper BGP configuration on your MikroTik router. The differences from a typical VPN setup with a Virtual Private Gateway are mostly in how the routing and BGP peering are managed through the Transit Gateway.
